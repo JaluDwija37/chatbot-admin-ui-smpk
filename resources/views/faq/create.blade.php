@@ -47,7 +47,7 @@
 
                         <!-- Submit Button -->
                         <div class="flex items-center gap-4 mt-6">
-                            <x-primary-button>{{ __('Save') }}</x-primary-button>
+                            <x-primary-button id="btn_save">{{ __('Save') }}</x-primary-button>
                         </div>
                     </form>
                 </div>
@@ -123,5 +123,38 @@
                 answerCount++;
             });
         });
+
+
+        // Add this inside your existing DOMContentLoaded event listener
+        document.getElementById('btn_save').addEventListener('click', function(e) {
+
+
+            // Collect form data
+            const formData = {
+                tag: document.querySelector('#tag').value,
+                patterns: Array.from(document.querySelectorAll('input[name="patterns[]"]')).map(input => input
+                    .value),
+                responses: Array.from(document.querySelectorAll('input[name="responses[]"]')).map(input => input
+                    .value)
+            };
+
+            // Send POST request
+            fetch('http://127.0.0.1:8080/trigger', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
     </script>
 </x-app-layout>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>

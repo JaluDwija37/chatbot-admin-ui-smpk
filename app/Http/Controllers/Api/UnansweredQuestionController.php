@@ -21,6 +21,7 @@ class UnansweredQuestionController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'question' => 'required',
+            'sender' => 'nullable',
         ]);
 
         if ($validator->fails()) {
@@ -29,6 +30,7 @@ class UnansweredQuestionController extends Controller
 
         $question = UnanswerdQuestion::create([
             'question' => $request->question,
+            'sender' => $request->sender,
         ]);
 
 

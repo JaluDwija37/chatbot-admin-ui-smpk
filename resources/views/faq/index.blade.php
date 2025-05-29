@@ -7,9 +7,25 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <a href="{{ route('faq.create') }}" class="bg-indigo-400 border-2 text-white font-bold py-2 px-3 rounded-md">
-                Create FAQ
-            </a>
+            <div class="flex items-center justify-between">
+                <a href="{{ route('faq.create') }}"
+                    class="bg-indigo-400 border-2 text-white font-bold py-2 px-3 rounded-md">
+                    Create FAQ
+                </a>
+                <div class="text-gray-700 flex items-center gap-2">
+                    <div>
+                        <span class="font-semibold">Last Trained:</span>
+                        <span id="lastTrained">Loading...</span>
+                    </div>
+                    <button onclick="getLastTrained()" class="bg-gray-200 p-2 rounded-full hover:bg-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-5">
                 <div class="container mx-auto px-4 sm:px-8">
                     <div class="py-8">
@@ -77,7 +93,7 @@
                                                             method="POST">
                                                             @csrf
                                                             @method('delete')
-                                                            <button
+                                                            <button id="btn_delete"
                                                                 class="bg-red-500 border-2 text-white font-bold py-2 px-3 rounded-md"
                                                                 type="submit">
                                                                 Delete
@@ -100,4 +116,49 @@
         </div>
     </div>
     </div>
+
 </x-app-layout>
+<script>
+    async function getLastTrained() {
+        try {
+            const response = await fetch('{{ url('/api/chatbot_status') }}');
+            const data = await response.json();
+            const date = new Date(data.created_at);
+            const formattedDate = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+            document.getElementById('lastTrained').textContent = formattedDate;
+        } catch (error) {
+            document.getElementById('lastTrained').textContent = 'Error loading data';
+        }
+    }
+    getLastTrained();
+    // Refresh every 30 seconds
+    setInterval(getLastTrained, 30000);
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('#btn_delete').forEach(button => {
+            button.addEventListener('click', function(e) {
+                // e.preventDefault();
+                
+                // Send POST request
+                fetch('http://127.0.0.1:8080/trigger', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    // Submit the form after successful API call
+                    this.closest('form').submit();
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+</script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
