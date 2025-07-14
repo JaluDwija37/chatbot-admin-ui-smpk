@@ -12,6 +12,13 @@ class ChatbotStatuses extends Model
     protected $fillable = [
         'status',
         'message',
+        'learning_rate',
+        'batch_size',
+        'optimizer',
+        'testing_percentage',
+        'accuracy',
+        'precision',
+        'recall',
         'created_at',
         'updated_at',
     ];
@@ -22,4 +29,9 @@ class ChatbotStatuses extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function chatHistories()
+    {
+        return $this->hasMany(\App\Models\ChatHistory::class, 'chatbot_status_id');
+    }
 }
